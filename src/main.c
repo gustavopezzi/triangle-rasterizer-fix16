@@ -98,14 +98,14 @@ void triangle_fill(vec2_t v0, vec2_t v1, vec2_t v2) {
       bool is_inside = w0 >= 0 && w1 >= 0 && w2 >= 0;
       if (is_inside) {
         // Compute an interpolation between the colors of vertices v0, v1, and v2 using barycentric weights
-        fix16_t alpha = fix16_div(w0, area);
-        fix16_t beta = fix16_div(w1, area);
-        fix16_t gamma = fix16_div(w2, area);
+        float alpha = fix16_to_float(fix16_div(w0, area));
+        float beta = fix16_to_float(fix16_div(w1, area));
+        float gamma = fix16_to_float(fix16_div(w2, area));
 
         int a = 0xFF;
-        int r = fix16_to_float(alpha) * colors[0].r + fix16_to_float(beta) * colors[1].r + fix16_to_float(gamma) * colors[2].r;
-        int g = fix16_to_float(alpha) * colors[0].g + fix16_to_float(beta) * colors[1].g + fix16_to_float(gamma) * colors[2].g;
-        int b = fix16_to_float(alpha) * colors[0].b + fix16_to_float(beta) * colors[1].b + fix16_to_float(gamma) * colors[2].b;
+        int r = (alpha) * colors[0].r + (beta) * colors[1].r + (gamma) * colors[2].r;
+        int g = (alpha) * colors[0].g + (beta) * colors[1].g + (gamma) * colors[2].g;
+        int b = (alpha) * colors[0].b + (beta) * colors[1].b + (gamma) * colors[2].b;
 
         // Combine A, R, G, and B into one final 32-bit color
         uint32_t interp_color = 0x00000000;
