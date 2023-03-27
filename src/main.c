@@ -57,8 +57,6 @@ fix16_t edge_cross(vec2_t* a, vec2_t* b, vec2_t* p) {
   return fix16_sub(fix16_mul(ab.x, ap.y), fix16_mul(ab.y, ap.x));
 }
 
-int count = 0;
-
 void triangle_fill(vec2_t v0, vec2_t v1, vec2_t v2) {
   // Finds the bounding box with all candidate pixels
   int x_min = fix16_to_int(MIN(MIN(v0.x, v1.x), v2.x));
@@ -83,7 +81,10 @@ void triangle_fill(vec2_t v0, vec2_t v1, vec2_t v2) {
   fix16_t bias2 = is_top_left(&v0, &v1) ? 0 : -0x00000001;
 
   // Compute the edge functions for the fist (top-left) point
-  vec2_t p0 = { fix16_from_float(x_min + 0.5f) , fix16_from_float(y_min + 0.5f) };
+  vec2_t p0 = {
+    fix16_from_float(x_min + 0.5f),
+    fix16_from_float(y_min + 0.5f)
+  };
   fix16_t w0_row = fix16_add(edge_cross(&v1, &v2, &p0), bias0);
   fix16_t w1_row = fix16_add(edge_cross(&v2, &v0, &p0), bias1);
   fix16_t w2_row = fix16_add(edge_cross(&v0, &v1, &p0), bias2);
@@ -97,11 +98,12 @@ void triangle_fill(vec2_t v0, vec2_t v1, vec2_t v2) {
     for (int x = x_min; x <= x_max; x++) {
       bool is_inside = w0 >= 0 && w1 >= 0 && w2 >= 0;
       if (is_inside) {
-        // Compute an interpolation between the colors of vertices v0, v1, and v2 using barycentric weights
+        // Compute the normalized barycentric weights alpha, beta, and gamma
         float alpha = fix16_to_float(fix16_div(w0, area));
         float beta = fix16_to_float(fix16_div(w1, area));
         float gamma = fix16_to_float(fix16_div(w2, area));
 
+        // Find the new RGB components interpolating vertex values using alpha, beta, and gamma
         int a = 0xFF;
         int r = (alpha) * colors[0].r + (beta) * colors[1].r + (gamma) * colors[2].r;
         int g = (alpha) * colors[0].g + (beta) * colors[1].g + (gamma) * colors[2].g;
